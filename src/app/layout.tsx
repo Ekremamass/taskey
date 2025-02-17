@@ -1,5 +1,5 @@
 import "./globals.css";
-import Navigation from "@/ui/navigation/Navigation";
+import Navigation from "@/components/ui/navigation/Navigation";
 import { SessionProvider } from "next-auth/react";
 
 export default function RootLayout({

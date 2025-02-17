@@ -1,3 +1,7 @@
+import { prisma } from "@/lib/prisma";
+import { User } from "@/lib/types";
+import Link from "next/link";
+import React from "react";
 import { auth } from "@/auth";
 import {
   Card,
@@ -7,11 +11,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { prisma } from "@/lib/prisma";
-import { User } from "@/lib/types";
-import React from "react";
+import { buttonVariants } from "@/components/ui/button";
 
-export default async function Page() {
+export default async function PostsPage() {
   try {
     const session = await auth();
     if (!session || !session.user || session.user.role !== "ADMIN") {
@@ -33,9 +35,12 @@ export default async function Page() {
                 <CardDescription>{user.email}</CardDescription>
               </CardContent>
               <CardFooter>
-                <a href={`/users/${user.id}`} className="btn">
+                <Link
+                  href={`/users/${user.id}`}
+                  className={buttonVariants({ variant: "outline" })}
+                >
                   View
-                </a>
+                </Link>
               </CardFooter>
             </Card>
           ))}
