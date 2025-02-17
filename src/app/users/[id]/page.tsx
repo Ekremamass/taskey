@@ -1,17 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { User } from "@/lib/types";
-import Link from "next/link";
 import React from "react";
 import { auth } from "@/auth";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
+import UserCard from "@/components/ui/users/userCard";
 
 export default async function PostPage({ params }: { params: { id: string } }) {
   try {
@@ -26,27 +17,12 @@ export default async function PostPage({ params }: { params: { id: string } }) {
 
     return (
       <main>
-        <h1 className="mb-4 text-xl md:text-2xl">Users</h1>
-        <Card key={user.id}>
-          <CardHeader>
-            <CardTitle>{user.name}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CardDescription>{user.email}</CardDescription>
-          </CardContent>
-          <CardFooter>
-            <Link
-              href={`/users/${user.id}`}
-              className={buttonVariants({ variant: "outline" })}
-            >
-              View
-            </Link>
-          </CardFooter>
-        </Card>
+        <h1 className="mb-4 text-xl md:text-2xl">User {`${user.name}`}</h1>
+        <UserCard user={user} />
       </main>
     );
   } catch (error) {
-    console.error("Error fetching users:", error);
-    return <div>Failed to load users</div>;
+    console.error("Error fetching user:", error);
+    return <div>Failed to load user</div>;
   }
 }
