@@ -1,18 +1,6 @@
-export function handleError(
-  error: unknown,
-  statusCode: number = 500
-): Response {
-  console.error("Error:", error);
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-  if (error instanceof Error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: statusCode,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  return new Response(JSON.stringify({ error: "Unknown error occurred" }), {
-    status: statusCode,
-    headers: { "Content-Type": "application/json" },
-  });
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
