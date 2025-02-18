@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { User } from "@/lib/types";
 import React from "react";
 import { auth } from "@/auth";
-import UserCard from "@/components/ui/users/userCard";
+import UserCard from "@/components/users/UserCard";
 
 export default async function PostPage({ params }: { params: { id: string } }) {
   try {
