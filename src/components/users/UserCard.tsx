@@ -17,7 +17,7 @@ type UserCardProps = {
 
 const UserCard: React.FC<UserCardProps> = ({ user }) => {
   return (
-    <Card key={user.id}>
+    <Card key={user.id} className="bg-zinc-950 dark:bg-white">
       <CardHeader>
         <CardTitle>{user.name}</CardTitle>
       </CardHeader>
