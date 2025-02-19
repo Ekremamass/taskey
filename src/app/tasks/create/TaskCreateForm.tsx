@@ -3,6 +3,7 @@
 
 import { z } from "zod";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,6 +42,9 @@ export default function TaskCreateForm({
 
     if (!result.success) {
       setErrors(result.errors || {});
+      toast.error((result.errors as string) || "Failed to create task");
+    } else {
+      toast.success("Task created successfully");
     }
 
     setIsSubmitting(false);

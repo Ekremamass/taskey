@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
-import { User } from "@/lib/types";
+import { User } from "@prisma/client";
 
 type UserCardProps = {
   user: User;
