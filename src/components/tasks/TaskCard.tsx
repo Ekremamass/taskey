@@ -23,7 +23,7 @@ type TaskCardProps = {
 
 const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   return (
-    <Card key={task.id} className="bg-green-300">
+    <Card key={task.id} className="bg-gray-200">
       <CardHeader>
         <CardTitle>{task.title}</CardTitle>
       </CardHeader>
