@@ -1,52 +1,78 @@
-import { AppSidebar } from "@/components/sidebar/app-sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { getProjects, getTasks, getTeams } from "@/lib/data";
+import Link from "next/link";
+import { auth } from "@/auth";
+import { Project, Task, Team } from "@prisma/client";
+import { buttonVariants } from "@/components/ui/button";
 
-export default function Page() {
+const HomePage = async () => {
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.id) {
+    return <div>Please sign in to view your dashboard.</div>;
+  }
+
+  const tasks = await getTasks(session.user.id);
+  const projects = await getProjects(session.user.id);
+  const teams = await getTeams(session.user.id);
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
-          </div>
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="container mx-auto px-4">
+      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold mb-2">My Tasks</h2>
+        <Link
+          href="/tasks/create"
+          className={buttonVariants({ variant: "outline" })}
+        >
+          Create Task
+        </Link>
+        <ul>
+          {tasks.map((task: Task) => (
+            <li key={task.id} className="mb-2">
+              <Link href={`/tasks/${task.id}`}>
+                <a>{task.title}</a>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold mb-2">My Projects</h2>
+        <Link
+          href="/projects/create"
+          className={buttonVariants({ variant: "outline" })}
+        >
+          Create Project
+        </Link>
+        <ul>
+          {projects.map((project: Project) => (
+            <li key={project.id} className="mb-2">
+              <Link href={`/projects/${project.id}`}>
+                <a>{project.name}</a>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold mb-2">My Teams</h2>
+        <Link
+          href="/teams/create"
+          className={buttonVariants({ variant: "outline" })}
+        >
+          Create Team
+        </Link>
+        <ul>
+          {teams.map((team: Team) => (
+            <li key={team.id} className="mb-2">
+              <Link href={`/teams/${team.id}`}>
+                <a>{team.name}</a>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
   );
-}
+};
+
+export default HomePage;
