@@ -10,24 +10,20 @@ import {
 } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { Task } from "@prisma/client";
-import { IoEnterOutline } from "react-icons/io5";
-import { FaProjectDiagram, FaUsers, FaCalendarAlt } from "react-icons/fa";
+import {
+  FaTasks,
+  FaProjectDiagram,
+  FaUsers,
+  FaCalendarAlt,
+} from "react-icons/fa";
 
 type TaskCardProps = {
   task: Task;
-  viewMode: "grid" | "list";
 };
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, viewMode }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   return (
-    <Card
-      key={task.id}
-      className={`${
-        viewMode === "list"
-          ? "flex flex-col md:flex-row p-4"
-          : "bg-gray-200 dark:bg-gray-800"
-      }`}
-    >
+    <Card key={task.id} className="bg-gray-200 dark:bg-gray-800">
       <CardHeader>
         <CardTitle>{task.title}</CardTitle>
       </CardHeader>
@@ -48,7 +44,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, viewMode }) => {
           href={`/tasks/${task.id}`}
           className={buttonVariants({ variant: "outline" })}
         >
-          <IoEnterOutline />
+          <FaTasks />
         </Link>
         {task.projectId && (
           <Link

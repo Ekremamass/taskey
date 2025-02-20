@@ -1,9 +1,11 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Task } from "@prisma/client";
-import TaskCard from "@/components/tasks/TaskCard";
+import TaskCard from "@/app/tasks/TaskCard";
 import ToggleButton from "@/components/ToggleButton";
 import { redirect } from "next/navigation";
+import { DataTable } from "../../components/ui/data-table";
+import { columns } from "./columns";
 
 export default async function Page({
   searchParams,
@@ -31,17 +33,17 @@ export default async function Page({
         <div className="mb-4">
           <ToggleButton viewMode={viewMode} />
         </div>
-        <div
-          className={`grid gap-6 ${
-            viewMode === "grid"
-              ? "sm:grid-cols-2 lg:grid-cols-4"
-              : "grid-cols-1"
-          }`}
-        >
-          {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} viewMode={viewMode} />
-          ))}
-        </div>
+        {viewMode === "list" ? (
+          <div className="container mx-auto py-10">
+            <DataTable columns={columns} data={tasks} />
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {tasks.map((task) => (
+              <TaskCard key={task.id} task={task} />
+            ))}
+          </div>
+        )}
       </main>
     );
   } catch (error) {

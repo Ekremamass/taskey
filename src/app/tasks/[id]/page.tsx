@@ -3,7 +3,7 @@ import React from "react";
 import { auth } from "@/auth";
 import UserCard from "@/components/users/UserCard";
 import { Task } from "@prisma/client";
-import TaskCard from "@/components/tasks/TaskCard";
+import TaskCard from "@/app/tasks/TaskCard";
 
 export default async function TaskPage({ params }: { params: { id: number } }) {
   try {
