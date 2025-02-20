@@ -81,9 +81,6 @@ enum Role {
 model Task {
   id         Int      @id @default(autoincrement())
   title      String   @db.VarChar(255)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  published  Boolean  @default(false)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
   projectId  Int?
@@ -92,6 +89,10 @@ model Task {
   team       Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
   calendarId Int?
   calendar   Calendar? @relation(fields: [calendarId], references: [id], onDelete: SetNull)
+  published  Boolean  @default(false)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([userId])
   @@index([projectId])

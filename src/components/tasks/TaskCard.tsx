@@ -23,7 +23,7 @@ type TaskCardProps = {
 
 const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   return (
-    <Card key={task.id} className="bg-gray-200">
+    <Card key={task.id} className="bg-gray-200 dark:bg-gray-800">
       <CardHeader>
         <CardTitle>{task.title}</CardTitle>
       </CardHeader>
@@ -44,14 +44,14 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
           href={`/tasks/${task.id}`}
           className={buttonVariants({ variant: "outline" })}
         >
-          <FaTasks className="mr-2" />
+          <FaTasks />
         </Link>
         {task.projectId && (
           <Link
             href={`/projects/${task.projectId}`}
             className={buttonVariants({ variant: "outline" })}
           >
-            <FaProjectDiagram className="mr-2" />
+            <FaProjectDiagram />
           </Link>
         )}
         {task.teamId && (
@@ -59,7 +59,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             href={`/teams/${task.teamId}`}
             className={buttonVariants({ variant: "outline" })}
           >
-            <FaUsers className="mr-2" />
+            <FaUsers />
           </Link>
         )}
         {task.calendarId && (
@@ -67,7 +67,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             href={`/calendars/${task.calendarId}`}
             className={buttonVariants({ variant: "outline" })}
           >
-            <FaCalendarAlt className="mr-2" />
+            <FaCalendarAlt />
           </Link>
         )}
       </CardFooter>

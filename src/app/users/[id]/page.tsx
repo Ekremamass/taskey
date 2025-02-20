@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { User } from "@/lib/types";
 import React from "react";
 import { auth } from "@/auth";
 import UserCard from "@/components/users/UserCard";
+import { User } from "@prisma/client";
 
-export default async function PostPage({ params }: { params: { id: string } }) {
+export default async function UserPage({ params }: { params: { id: string } }) {
   try {
     const session = await auth();
     if (!session || !session.user || session.user.role !== "ADMIN") {
