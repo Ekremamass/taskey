@@ -17,16 +17,13 @@ export const columns: ColumnDef<Task>[] = [
   {
     accessorKey: "title",
     header: "Title",
-    size: 300, // Increase width for title
-    cell: ({ row }) => (
-      <div className="font-medium max-w-[300px] truncate">
-        {row.original.title}
-      </div>
-    ),
+    size: 400, // Increase width for title
+    cell: ({ row }) => <div className="truncate">{row.original.title}</div>,
   },
   {
     accessorKey: "status",
     header: "Status",
+    size: 100, // Decrease width for status selector
     cell: ({ row }) => (
       <TaskStatusSelector
         initialStatus={row.original.status}
@@ -76,42 +73,24 @@ export const columns: ColumnDef<Task>[] = [
     ),
   },
   {
-    accessorKey: "createdAt",
-    header: "Created",
-    cell: ({ cell }) => (
+    header: "Info",
+    cell: ({ row }) => (
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger>
-            <div className="flex items-center space-x-1">
-              <FaInfoCircle className="text-muted-foreground" />
-              <span className="text-xs">
-                {cell.getValue<Date>().toLocaleDateString()}
-              </span>
-            </div>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="icon">
+              <FaInfoCircle />
+            </Button>
           </TooltipTrigger>
           <TooltipContent>
-            Full Date: {cell.getValue<Date>().toLocaleString()}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    ),
-  },
-  {
-    accessorKey: "updatedAt",
-    header: "Updated",
-    cell: ({ cell }) => (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger>
-            <div className="flex items-center space-x-1">
-              <FaInfoCircle className="text-muted-foreground" />
-              <span className="text-xs">
-                {cell.getValue<Date>().toLocaleDateString()}
-              </span>
+            <div>
+              <p>
+                Created At: {new Date(row.original.createdAt).toLocaleString()}
+              </p>
+              <p>
+                Updated At: {new Date(row.original.updatedAt).toLocaleString()}
+              </p>
             </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            Full Date: {cell.getValue<Date>().toLocaleString()}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

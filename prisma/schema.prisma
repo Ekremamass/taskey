@@ -79,15 +79,16 @@ enum Role {
 }
 
 enum Status {
-  OPEN
+  TODO
   IN_PROGRESS
-  COMPLETE
+  DONE
+  BLOCKED
 }
 
 model Task {
   id         Int      @id @default(autoincrement())
   title      String   @db.VarChar(255)
-  status     Status   @default(OPEN)
+  status     Status   @default(TODO)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
   projectId  Int?
