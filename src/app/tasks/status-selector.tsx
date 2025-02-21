@@ -34,16 +34,16 @@ export function TaskStatusSelector({
   // Render nothing until mounted to prevent hydration issues
   if (!isMounted) return null;
 
-  const getStatusColor = (status: Status) => {
+  const getStatusStyles = (status: Status) => {
     switch (status) {
       case "TODO":
-        return "text-blue-500";
+        return "bg-blue-100 text-blue-500";
       case "IN_PROGRESS":
-        return "text-yellow-500";
+        return "bg-yellow-100 text-yellow-500";
       case "DONE":
-        return "text-green-500";
+        return "bg-green-100 text-green-500";
       case "BLOCKED":
-        return "text-red-500";
+        return "bg-red-100 text-red-500";
       default:
         return "";
     }
@@ -51,20 +51,23 @@ export function TaskStatusSelector({
 
   return (
     <Select value={status} onValueChange={handleStatusChange}>
-      <SelectTrigger className={`w-[160px] ${getStatusColor(status)}`}>
+      <SelectTrigger className={`w-full ${getStatusStyles(status)}`}>
         <SelectValue placeholder="Select status" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="TODO" className="text-blue-500">
+        <SelectItem value="TODO" className="bg-blue-100 text-blue-500">
           TODO
         </SelectItem>
-        <SelectItem value="IN_PROGRESS" className="text-yellow-500">
+        <SelectItem
+          value="IN_PROGRESS"
+          className="bg-yellow-100 text-yellow-500"
+        >
           IN PROGRESS
         </SelectItem>
-        <SelectItem value="DONE" className="text-green-500">
+        <SelectItem value="DONE" className="bg-green-100 text-green-500">
           DONE
         </SelectItem>
-        <SelectItem value="BLOCKED" className="text-red-500">
+        <SelectItem value="BLOCKED" className="bg-red-100 text-red-500">
           BLOCKED
         </SelectItem>
       </SelectContent>

@@ -34,7 +34,7 @@ export const columns: ColumnDef<Task>[] = [
   {
     header: "Actions",
     cell: ({ row }) => (
-      <div className="flex space-x-2">
+      <div className="flex space-x-2 w-full">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
