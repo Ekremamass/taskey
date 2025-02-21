@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { updateTaskStatus } from "../../lib/actions";
+import { updateTaskStatus } from "../actions/task";
 import { Status } from "@prisma/client";
 
 export function TaskStatusSelector({

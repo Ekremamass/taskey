@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Status } from "@prisma/client";
 
+
 export async function updateTaskStatus(taskId: number, newStatus: Status) {
   const session = await auth();
 

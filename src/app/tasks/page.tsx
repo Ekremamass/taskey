@@ -25,7 +25,8 @@ export default async function Page({
       },
     });
 
-    const viewMode = (await searchParams.viewMode) === "list" ? "list" : "grid";
+    const getViewMode = await searchParams.viewMode;
+    const viewMode = getViewMode === "list" ? "list" : "grid";
 
     return (
       <main>
