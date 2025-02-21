@@ -14,6 +14,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async session({ session, user }) {
       session.user.id = user.id;
+      session.user.bio = user.bio;
+      session.user.location = user.location;
+      session.user.phoneNumber = user.phoneNumber;
+      session.user.twoFactorEnabled = user.twoFactorEnabled;
       return session;
     },
   },
