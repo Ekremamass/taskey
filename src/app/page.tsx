@@ -28,9 +28,7 @@ const HomePage = async () => {
         <ul>
           {tasks.map((task: Task) => (
             <li key={task.id} className="mb-2">
-              <Link href={`/tasks/${task.id}`}>
-                <a>{task.title}</a>
-              </Link>
+              <Link href={`/tasks/${task.id}`}>{task.title}</Link>
             </li>
           ))}
         </ul>
@@ -46,9 +44,7 @@ const HomePage = async () => {
         <ul>
           {projects.map((project: Project) => (
             <li key={project.id} className="mb-2">
-              <Link href={`/projects/${project.id}`}>
-                <a>{project.name}</a>
-              </Link>
+              <Link href={`/projects/${project.id}`}>{project.name}</Link>
             </li>
           ))}
         </ul>
@@ -64,9 +60,7 @@ const HomePage = async () => {
         <ul>
           {teams.map((team: Team) => (
             <li key={team.id} className="mb-2">
-              <Link href={`/teams/${team.id}`}>
-                <a>{team.name}</a>
-              </Link>
+              <Link href={`/teams/${team.id}`}>{team.name}</Link>
             </li>
           ))}
         </ul>
