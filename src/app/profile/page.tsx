@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { getUserProfile } from "../actions/profile";
+import { getUserProfile } from "../../actions/user";
 import { toast } from "sonner";
 import ProfileForm from "./form";
 
@@ -10,9 +10,10 @@ export default async function ProfilePage () {
       }
       try{
         const user = await getUserProfile();
+        return (
         <div>
             <ProfileForm user={user} />
-        </div>
+        </div>)
     } catch (error) {
         toast("Unauthorized");
         return <div>Failed to load user</div>

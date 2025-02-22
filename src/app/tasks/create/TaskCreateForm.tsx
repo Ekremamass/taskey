@@ -14,15 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createTask } from "../../actions/task";
-
-// Zod Schema
-const taskSchema = z.object({
-  title: z.string().min(1, "Title is required").max(255, "Title is too long"),
-  projectId: z.string().optional(),
-  teamId: z.string().optional(),
-  published: z.boolean().default(false),
-});
+import { createTask } from "../../../actions/task";
 
 export default function TaskCreateForm({
   projects,
