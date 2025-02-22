@@ -1,6 +1,6 @@
 import { getProjects, getTasks, getTeams } from "@/lib/data";
 import Link from "next/link";
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import { Project, Task, Team } from "@prisma/client";
 import { buttonVariants } from "@/components/ui/button";
 

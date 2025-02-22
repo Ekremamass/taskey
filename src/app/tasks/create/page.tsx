@@ -1,5 +1,5 @@
 // app/tasks/create/page.tsx
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import TaskCreateForm from "./TaskCreateForm";
 import { getProjects, getTeams } from "@/lib/data";
 

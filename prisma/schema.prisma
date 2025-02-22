@@ -16,7 +16,7 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  role          Role      @default(USER)
+  role          Role      @default(MEMBER)
   tasks         Task[]
   teamId        Int?
   team          Team?     @relation(fields: [teamId], references: [id], onDelete: SetNull)
@@ -24,11 +24,11 @@ model User {
   accounts Account[]
   sessions Session[]
 
-  bio              String?
+  bio              String?   @db.VarChar(255)
   location         String?
-  phoneNumber      String?
-  timezone         String?
-  language         String?
+  phoneNumber      String?   @unique
+  timezone         String?   @default("UTC")
+  language         String?   @default("en")
   twoFactorEnabled Boolean   @default(false)
   lastLogin        DateTime?
 
@@ -82,8 +82,9 @@ model VerificationToken {
 }
 
 enum Role {
-  USER
   ADMIN
+  MANAGER
+  MEMBER
 }
 
 enum Status {

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import React from "react";
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import UserCard from "@/components/users/UserCard";
 import { User } from "@prisma/client";
 

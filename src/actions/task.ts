@@ -1,10 +1,9 @@
 "use server";
 
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Status } from "@prisma/client";
 import { z } from "zod";
-
 
 // Zod Schema
 const taskSchema = z.object({
@@ -13,7 +12,6 @@ const taskSchema = z.object({
   teamId: z.string().optional(),
   published: z.boolean().default(false),
 });
-
 
 export async function updateTaskStatus(taskId: number, newStatus: Status) {
   const session = await auth();
@@ -40,8 +38,6 @@ export async function updateTaskStatus(taskId: number, newStatus: Status) {
     data: { status: newStatus },
   });
 }
-
-
 
 export async function createTask(formData: FormData) {
   const validatedFields = taskSchema.safeParse({
