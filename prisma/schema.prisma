@@ -86,6 +86,12 @@ enum Role {
     MEMBER
 }
 
+enum MemberRole {
+    LEADER
+    CONTRIBUTOR
+    VIEWER
+}
+
 model Team {
     id       Int            @id @default(autoincrement())
     name     String
@@ -101,7 +107,7 @@ model TeamsOnUsers {
     user   User   @relation(fields: [userId], references: [id])
     userId String
 
-    role Role @default(MEMBER)
+    role MemberRole @default(CONTRIBUTOR)
 
     team   Team @relation(fields: [teamId], references: [id])
     teamId Int
