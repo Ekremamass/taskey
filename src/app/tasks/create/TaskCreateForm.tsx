@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createTask } from "./actions";
+import { createTask } from "../../actions/task";
 
 // Zod Schema
 const taskSchema = z.object({
