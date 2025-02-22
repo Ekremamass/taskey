@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { getAllUsers, updateUserRole } from "@/actions/user";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectTrigger,
@@ -11,13 +10,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-
-type User = {
-  id: string;
-  name?: string;
-  email: string;
-  role: "ADMIN" | "MANAGER" | "MEMBER";
-};
+import { User } from "@prisma/client";
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
