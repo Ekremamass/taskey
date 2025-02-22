@@ -10,6 +10,7 @@ import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { Separator } from "@radix-ui/react-separator";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { ModeToggle } from "@/components/dark-mode/ModeToggle";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
   children,
@@ -43,6 +44,7 @@ export default function RootLayout({
                   <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min p-4">
                     {children}
                   </div>
+                  <Toaster />
                 </div>
               </SidebarInset>
             </SidebarProvider>
