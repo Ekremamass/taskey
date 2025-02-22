@@ -11,6 +11,13 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { User } from "@prisma/client";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
@@ -48,36 +55,41 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h1 className="text-xl font-bold mb-4">User Management</h1>
-      <div className="space-y-4">
-        {users.length === 0 ? (
-          <p className="text-gray-500 text-center">No users found.</p>
-        ) : (
-          users.map((user) => (
-            <div
-              key={user.id}
-              className="flex items-center justify-between bg-gray-100 p-3 rounded-lg shadow-sm"
-            >
-              <span className="font-medium">{user.name || "No Name"}</span>
-              <Select
-                defaultValue={user.role}
-                onValueChange={(value) => handleRoleChange(user.id, value)}
-                disabled={loading}
+    <Card className="w-[500px]">
+      <CardHeader>
+        <CardTitle>User Management</CardTitle>
+        <CardDescription>Manage Users Roles</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {users.length === 0 ? (
+            <p className="text-gray-500 text-center">No users found.</p>
+          ) : (
+            users.map((user) => (
+              <div
+                key={user.id}
+                className="flex items-center justify-between bg-gray-100 p-3 rounded-lg shadow-sm"
               >
-                <SelectTrigger className="w-[150px]" disabled={loading}>
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent className="w-[150px]">
-                  <SelectItem value="ADMIN">Admin</SelectItem>
-                  <SelectItem value="MANAGER">Manager</SelectItem>
-                  <SelectItem value="MEMBER">Member</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
+                <span className="font-medium">{user.name || "No Name"}</span>
+                <Select
+                  defaultValue={user.role}
+                  onValueChange={(value) => handleRoleChange(user.id, value)}
+                  disabled={loading}
+                >
+                  <SelectTrigger className="w-[150px]" disabled={loading}>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent className="w-[150px]">
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                    <SelectItem value="MANAGER">Manager</SelectItem>
+                    <SelectItem value="MEMBER">Member</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            ))
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
