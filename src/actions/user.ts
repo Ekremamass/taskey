@@ -10,7 +10,7 @@ import { z } from "zod";
 
 export async function getUserProfile() {
   const session = await auth();
-  if (!session?.user || !session?.user?.email) throw new Error("Unauthorized");
+  if (!session?.user?.email) throw new Error("Unauthorized");
 
   return await prisma.user.findUnique({
     where: { email: session.user.email },
@@ -39,7 +39,7 @@ export async function updateUserProfile(data: {
   language?: string;
 }) {
   const session = await auth();
-  if (!session?.user || !session?.user?.email) throw new Error("Unauthorized");
+  if (!session?.user?.email) throw new Error("Unauthorized");
 
   try {
     const updatedUser = await prisma.user.update({
@@ -55,7 +55,7 @@ export async function updateUserProfile(data: {
   }
 }
 
-// Fetch all users (Only Admins can do this)
+// ADMINS ONLY
 export async function getAllUsers() {
   await authorizeRole(["ADMIN"]);
   return prisma.user.findMany({
@@ -72,7 +72,7 @@ export async function getAllUsers() {
   });
 }
 
-// Update user role (Only Admins can change roles)
+// ADMINS ONLY
 export async function updateUserRole(
   userId: string,
   newRole: "ADMIN" | "MANAGER" | "MEMBER"

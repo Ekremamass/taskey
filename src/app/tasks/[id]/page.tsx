@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import React from "react";
 import { auth } from "@/lib/auth";
-import UserCard from "@/components/users/UserCard";
+import UserCard from "@/app/users/UserCard";
 import { Task } from "@prisma/client";
 import TaskCard from "@/app/tasks/TaskCard";
 
