@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import React from "react";
-import UserCard from "@/app/users/UserCard";
+import UserCard from "@/components/users/UserCard";
 import { User } from "@prisma/client";
 
 export default async function Page() {
@@ -24,7 +24,6 @@ export default async function Page() {
       </main>
     );
   } catch (error) {
-    console.error("Error fetching users:", error);
     return <div>Failed to load users</div>;
   }
 }

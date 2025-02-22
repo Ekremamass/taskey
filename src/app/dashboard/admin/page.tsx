@@ -55,7 +55,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <Card className="w-[500px]">
+    <Card className="sm:[200px] md:[500px] xl:w-[700px]">
       <CardHeader>
         <CardTitle>User Management</CardTitle>
         <CardDescription>Manage Users Roles</CardDescription>

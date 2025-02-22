@@ -17,7 +17,7 @@ export async function getProjects(userId: string): Promise<Project[]> {
       team: {
         users: {
           some: {
-            id: userId,
+            userId,
           },
         },
       },
@@ -31,9 +31,11 @@ export async function getTeams(userId: string): Promise<Team[]> {
     where: {
       users: {
         some: {
-          id: userId,
+          userId,
         },
       },
     },
   });
 }
+
+await prisma.teamsOnUsers.
