@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
-import { User, TeamsOnUsers } from "@prisma/client";
+import { User, TeamsOnUsers, MemberRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 type UserCardProps = {
@@ -17,14 +17,7 @@ type UserCardProps = {
   teamRole?: MemberRole;
 };
 
-const UserCard: React.FC<UserCardProps> = ({ user, teamId }) => {
-  const teamRole = null;
-  if (teamId) {
-    teamRole = await prisma.teamsOnUsers.findUnique({
-      where: { userId_teamId: { userId: user.id, teamId: teamId } },
-    });
-  }
-
+const UserCard: React.FC<UserCardProps> = ({ user, teamRole }) => {
   return (
     <Card key={user.id}>
       <CardHeader>

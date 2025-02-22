@@ -84,3 +84,10 @@ export async function updateUserRole(
     data: { role: newRole },
   });
 }
+
+export async function getUserTeamRole(userId: string, teamId: number) {
+  return prisma.teamsOnUsers.findUnique({
+    where: { userId_teamId: { userId, teamId } },
+    select: { role: true },
+  });
+}
