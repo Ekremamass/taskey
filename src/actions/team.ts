@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getUserTeamRole } from "@/actions/user";
 
-const fetchTeamData = async (teamId: number, userId: string) => {
+export const getTeamData = async (teamId: number, userId: string) => {
   const team = await prisma.team.findUnique({ where: { id: teamId } });
   if (!team) {
     throw new Error("Team not found");
@@ -32,5 +32,3 @@ const fetchTeamData = async (teamId: number, userId: string) => {
 
   return { teamName: team.name, membersWithRoles, tasks };
 };
-
-export default fetchTeamData;
