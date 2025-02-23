@@ -4,9 +4,7 @@ import { auth } from "@/lib/auth";
 import { authorizeRole } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 
-// Zod Schema
 
 export async function getUserProfile() {
   const session = await auth();
