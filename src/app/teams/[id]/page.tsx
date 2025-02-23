@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { useSession } from "next-auth/react"
 import UserCard from "@/components/users/UserCard";
 import { DataTable } from "@/components/ui/data-table";
 import { taskColumns } from "./taskColumns";
@@ -12,6 +12,7 @@ import addTask from "./addTask";
 
 export default function TeamPage() {
   const { id } = useParams();
+  const { data: session } = useSession()
   const [newMemberId, setNewMemberId] = useState("");
   const [newTask, setNewTask] = useState({ title: "", description: "", status: "TODO", projectId: null, calendarId: null, published: false });
   const [membersWithRoles, setMembersWithRoles] = useState([]);
@@ -21,7 +22,6 @@ export default function TeamPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const session = await auth();
         const user = session?.user;
         if (!user?.id) {
           return;
