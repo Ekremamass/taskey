@@ -2,22 +2,29 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useSession } from "next-auth/react"
+import { useSession } from "next-auth/react";
 import UserCard from "@/components/users/UserCard";
 import { DataTable } from "@/components/ui/data-table";
 import { taskColumns } from "./taskColumns";
-import fetchTeamData from "./fetchTeamData";
 import addMember from "./addMember";
 import addTask from "./addTask";
+import { getTeamData } from "@/actions/team";
 
 export default function TeamPage() {
   const { id } = useParams();
-  const { data: session } = useSession()
-  const [newMemberId, setNewMemberId] = useState("");
-  const [newTask, setNewTask] = useState({ title: "", description: "", status: "TODO", projectId: null, calendarId: null, published: false });
-  const [membersWithRoles, setMembersWithRoles] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [teamName, setTeamName] = useState("");
+  const { data: session } = useSession();
+  const [newMemberId, setNewMemberId] = useState();
+  const [newTask, setNewTask] = useState({
+    title: "",
+    description: "",
+    status: "TODO",
+    projectId: null as number | null,
+    calendarId: null as number | null,
+    published: false,
+  });
+  const [membersWithRoles, setMembersWithRoles] = useState<any>([]);
+  const [tasks, setTasks] = useState<any>([]);
+  const [teamName, setTeamName] = useState<any>("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,7 +35,10 @@ export default function TeamPage() {
         }
         const teamId = Number(id);
 
-        const { teamName, membersWithRoles, tasks } = await fetchTeamData(teamId, user.id);
+        const { teamName, membersWithRoles, tasks } = await getTeamData(
+          teamId,
+          user.id
+        );
         setTeamName(teamName);
         setMembersWithRoles(membersWithRoles);
         setTasks(tasks);
@@ -48,7 +58,7 @@ export default function TeamPage() {
       <div className="mb-8">
         <h2>Members</h2>
         {membersWithRoles.length > 0 ? (
-          membersWithRoles.map((member) => (
+          membersWithRoles.map((member: any) => (
             <UserCard
               key={member.user.id}
               user={member.user}
@@ -65,7 +75,9 @@ export default function TeamPage() {
             onChange={(e) => setNewMemberId(e.target.value)}
             placeholder="New member ID"
           />
-          <button onClick={() => addMember(newMemberId, Number(id))}>Add Member</button>
+          <button onClick={() => addMember(newMemberId, Number(id))}>
+            Add Member
+          </button>
         </div>
       </div>
       <div>
@@ -91,7 +103,7 @@ export default function TeamPage() {
               setNewTask({ ...newTask, description: e.target.value })
             }
             placeholder="Task description"
-          /> 
+          />
           <select
             value={newTask.status}
             onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
@@ -104,20 +116,32 @@ export default function TeamPage() {
           <input
             type="number"
             value={newTask.projectId || ""}
-            onChange={(e) => setNewTask({ ...newTask, projectId: e.target.value ? Number(e.target.value) : null })}
+            onChange={(e) =>
+              setNewTask({
+                ...newTask,
+                projectId: e.target.value ? Number(e.target.value) : null,
+              })
+            }
             placeholder="Project ID"
           />
           <input
             type="number"
             value={newTask.calendarId || ""}
-            onChange={(e) => setNewTask({ ...newTask, calendarId: e.target.value ? Number(e.target.value) : null })}
+            onChange={(e) =>
+              setNewTask({
+                ...newTask,
+                calendarId: e.target.value ? Number(e.target.value) : null,
+              })
+            }
             placeholder="Calendar ID"
           />
           <label>
             <input
               type="checkbox"
               checked={newTask.published}
-              onChange={(e) => setNewTask({ ...newTask, published: e.target.checked })}
+              onChange={(e) =>
+                setNewTask({ ...newTask, published: e.target.checked })
+              }
             />
             Published
           </label>

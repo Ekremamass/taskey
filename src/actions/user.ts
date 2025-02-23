@@ -5,7 +5,6 @@ import { authorizeRole } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-
 export async function getUserProfile() {
   const session = await auth();
   if (!session?.user?.email) throw new Error("Unauthorized");
