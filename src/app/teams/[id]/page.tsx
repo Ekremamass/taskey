@@ -1,82 +1,129 @@
-import { prisma } from "@/lib/prisma";
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { auth } from "@/lib/auth";
 import UserCard from "@/components/users/UserCard";
-import { getUserTeamRole } from "@/actions/user";
 import { DataTable } from "@/components/ui/data-table";
-import { columns as taskColumns } from "@/app/tasks/columns";
+import { taskColumns } from "./taskColumns";
+import fetchTeamData from "./fetchTeamData";
+import addMember from "./addMember";
+import addTask from "./addTask";
 
-export default async function TeamPage({ params }: { params: { id: string } }) {
-  try {
-    const session = await auth();
-    const user = session?.user;
-    if (!user?.id) {
-      return <div>Login to access team.</div>;
+export default function TeamPage() {
+  const { id } = useParams();
+  const [newMemberId, setNewMemberId] = useState("");
+  const [newTask, setNewTask] = useState({ title: "", description: "", status: "TODO", projectId: null, calendarId: null, published: false });
+  const [membersWithRoles, setMembersWithRoles] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [teamName, setTeamName] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const session = await auth();
+        const user = session?.user;
+        if (!user?.id) {
+          return;
+        }
+        const teamId = Number(id);
+
+        const { teamName, membersWithRoles, tasks } = await fetchTeamData(teamId, user.id);
+        setTeamName(teamName);
+        setMembersWithRoles(membersWithRoles);
+        setTasks(tasks);
+      } catch (error) {
+        console.error("Error loading team:", error);
+      }
+    };
+
+    if (id) {
+      fetchData();
     }
-    const id = Number((await params).id);
+  }, [id]);
 
-    const team = await prisma.team.findUnique({ where: { id: id } });
-    if (!team) {
-      return <div>Team not found.</div>;
-    }
-
-    const userInTeam = await prisma.teamsOnUsers.findUnique({
-      where: { userId_teamId: { userId: user.id, teamId: id } },
-    });
-    if (!userInTeam) {
-      return <div>You are not a member of this team.</div>;
-    }
-
-    const members = await prisma.teamsOnUsers.findMany({
-      where: { teamId: team.id },
-      select: { user: true },
-    });
-    if (!members) {
-      return <div>Team has no members.</div>;
-    }
-
-    const membersWithRoles = await Promise.all(
-      members.map(async (member) => {
-        const role = await getUserTeamRole(member.user.id, team.id);
-        return { ...member, role: role?.role || "VIEWER" };
-      })
-    );
-
-    const tasks = await prisma.task.findMany({
-      where: { teamId: team.id },
-    });
-
-    return (
-      <main>
-        <h1 className="mb-4 text-xl md:text-2xl">Team {`${team.name}`}</h1>
-        <div className="mb-8">
-          <h2>Members</h2>
-          {membersWithRoles.length > 0 ? (
-            membersWithRoles.map((member) => (
-              <UserCard
-                key={member.user.id}
-                user={member.user}
-                teamRole={member.role}
-              />
-            ))
-          ) : (
-            <div>No members</div>
-          )}
-        </div>
+  return (
+    <main>
+      <h1 className="mb-4 text-xl md:text-2xl">Team {teamName}</h1>
+      <div className="mb-8">
+        <h2>Members</h2>
+        {membersWithRoles.length > 0 ? (
+          membersWithRoles.map((member) => (
+            <UserCard
+              key={member.user.id}
+              user={member.user}
+              teamRole={member.role}
+            />
+          ))
+        ) : (
+          <div>No members</div>
+        )}
         <div>
-          <h2>Tasks</h2>
-          {tasks.length > 0 ? (
-            <div className="container mx-auto py-10">
-              <DataTable columns={taskColumns} data={tasks} />
-            </div>
-          ) : (
-            <div>No tasks</div>
-          )}
+          <input
+            type="text"
+            value={newMemberId}
+            onChange={(e) => setNewMemberId(e.target.value)}
+            placeholder="New member ID"
+          />
+          <button onClick={() => addMember(newMemberId, Number(id))}>Add Member</button>
         </div>
-      </main>
-    );
-  } catch (error) {
-    console.error("Error loading team:", error);
-    return <div>Failed to load team</div>;
-  }
+      </div>
+      <div>
+        <h2>Tasks</h2>
+        {tasks.length > 0 ? (
+          <div className="container mx-auto py-10">
+            <DataTable columns={taskColumns} data={tasks} />
+          </div>
+        ) : (
+          <div>No tasks</div>
+        )}
+        <div>
+          <input
+            type="text"
+            value={newTask.title}
+            onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+            placeholder="Task title"
+          />
+          <input
+            type="text"
+            value={newTask.description}
+            onChange={(e) =>
+              setNewTask({ ...newTask, description: e.target.value })
+            }
+            placeholder="Task description"
+          /> 
+          <select
+            value={newTask.status}
+            onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
+          >
+            <option value="TODO">TODO</option>
+            <option value="IN_PROGRESS">IN_PROGRESS</option>
+            <option value="DONE">DONE</option>
+            <option value="BLOCKED">BLOCKED</option>
+          </select>
+          <input
+            type="number"
+            value={newTask.projectId || ""}
+            onChange={(e) => setNewTask({ ...newTask, projectId: e.target.value ? Number(e.target.value) : null })}
+            placeholder="Project ID"
+          />
+          <input
+            type="number"
+            value={newTask.calendarId || ""}
+            onChange={(e) => setNewTask({ ...newTask, calendarId: e.target.value ? Number(e.target.value) : null })}
+            placeholder="Calendar ID"
+          />
+          <label>
+            <input
+              type="checkbox"
+              checked={newTask.published}
+              onChange={(e) => setNewTask({ ...newTask, published: e.target.checked })}
+            />
+            Published
+          </label>
+          <button onClick={() => addTask(newTask, Number(id))}>Add Task</button>
+        </div>
+      </div>
+    </main>
+  );
 }

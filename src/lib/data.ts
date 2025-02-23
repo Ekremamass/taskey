@@ -37,5 +37,3 @@ export async function getTeams(userId: string): Promise<Team[]> {
     },
   });
 }
-
-await prisma.teamsOnUsers.
