@@ -17,7 +17,7 @@ const HomePage = async () => {
   return (
     <div className="container mx-auto px-4">
       <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <section className="mb-8">
+      <section className="mb-4">
         <h2 className="text-xl font-semibold mb-2">My Tasks</h2>
         <Link
           href="/tasks/create"
@@ -33,7 +33,7 @@ const HomePage = async () => {
           ))}
         </ul>
       </section>
-      <section className="mb-8">
+      <section className="mb-4">
         <h2 className="text-xl font-semibold mb-2">My Projects</h2>
         <Link
           href="/projects/create"
@@ -49,7 +49,7 @@ const HomePage = async () => {
           ))}
         </ul>
       </section>
-      <section className="mb-8">
+      <section className="mb-4">
         <h2 className="text-xl font-semibold mb-2">My Teams</h2>
         <Link
           href="/teams/create"
