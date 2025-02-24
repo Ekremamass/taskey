@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import React from "react";
 import { auth } from "@/lib/auth";
-import UserCard from "@/components/users/UserCard";
+import UserCard from "@/components/cards/UserCard";
 import { User } from "@prisma/client";
 
 export default async function UserPage({ params }: { params: { id: string } }) {

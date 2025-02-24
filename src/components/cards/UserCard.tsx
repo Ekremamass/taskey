@@ -19,7 +19,10 @@ type UserCardProps = {
 
 const UserCard: React.FC<UserCardProps> = ({ user, teamRole }) => {
   return (
-    <Card key={user.id} className="max-w-xs m-4">
+    <Card
+      key={user.id}
+      className="w-full sm:w-80 md:w-96 lg:w-[22rem] xl:w-[24rem] m-4 shadow-lg rounded-xl"
+    >
       <CardHeader>
         <CardTitle>{user.name}</CardTitle>
       </CardHeader>

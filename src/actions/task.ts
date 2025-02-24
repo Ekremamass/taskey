@@ -66,7 +66,7 @@ export async function createTask(formData: FormData) {
     const task = await prisma.task.create({
       data: {
         ...validatedFields.data,
-        userId: session.user.id,
+        ownerId: session.user.id,
         projectId: validatedFields.data.projectId
           ? Number(validatedFields.data.projectId)
           : undefined,

@@ -4,37 +4,42 @@ import { prisma } from "@/lib/prisma";
 import { getUserTeamRole } from "@/actions/user";
 import { log } from "console";
 
-export const getTeamData = async (teamId: number, userId: string) => {
-  const team = await prisma.team.findUnique({ where: { id: teamId } });
-  if (!team) {
-    throw new Error("Team not found");
+export async function getTeamData(teamId: number, userId: string) {
+  try {
+    const team = await prisma.team.findUnique({ where: { id: teamId } });
+
+    if (!team) {
+      return { error: "Team not found." };
+    }
+
+    const userInTeam = await prisma.teamsOnUsers.findUnique({
+      where: { userId_teamId: { userId, teamId } },
+    });
+
+    if (!userInTeam) {
+      return { error: "You are not a member of this team." };
+    }
+
+    const members = await prisma.teamsOnUsers.findMany({
+      where: { teamId },
+      select: { user: true },
+    });
+
+    const membersWithRoles = await Promise.all(
+      members.map(async (member) => {
+        const role = await getUserTeamRole(member.user.id, teamId);
+        return { ...member, role: role?.role || "VIEWER" };
+      })
+    );
+
+    const tasks = await prisma.task.findMany({ where: { teamId } });
+
+    return { team, membersWithRoles, tasks };
+  } catch (error) {
+    console.error("Error fetching team data:", error);
+    return { error: "Failed to load team data." };
   }
-
-  const userInTeam = await prisma.teamsOnUsers.findUnique({
-    where: { userId_teamId: { userId, teamId } },
-  });
-  if (!userInTeam) {
-    throw new Error("User not in team");
-  }
-
-  const members = await prisma.teamsOnUsers.findMany({
-    where: { teamId: team.id },
-    select: { user: true },
-  });
-
-  const membersWithRoles = await Promise.all(
-    members.map(async (member) => {
-      const role = await getUserTeamRole(member.user.id, team.id);
-      return { ...member, role: role?.role || "VIEWER" };
-    })
-  );
-
-  const tasks = await prisma.task.findMany({
-    where: { teamId: team.id },
-  });
-
-  return { teamName: team.name, membersWithRoles, tasks };
-};
+}
 
 /**
  * Invite a user to a team via email.
