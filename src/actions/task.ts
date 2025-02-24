@@ -5,14 +5,6 @@ import { prisma } from "@/lib/prisma";
 import { Status } from "@prisma/client";
 import { z } from "zod";
 
-// Zod Schema
-const taskSchema = z.object({
-  title: z.string().min(1, "Title is required").max(255, "Title is too long"),
-  projectId: z.string().optional(),
-  teamId: z.string().optional(),
-  published: z.boolean().default(false),
-});
-
 export async function updateTaskStatus(taskId: number, newStatus: Status) {
   const session = await auth();
 
@@ -25,7 +17,7 @@ export async function updateTaskStatus(taskId: number, newStatus: Status) {
     throw new Error("Task not found");
   }
 
-  if (session.user.id !== curr_task.userId) {
+  if (session.user.id !== curr_task.ownerId) {
     throw new Error("Unauthorized");
   }
 
@@ -39,11 +31,28 @@ export async function updateTaskStatus(taskId: number, newStatus: Status) {
   });
 }
 
+// Zod Schema
+/* const StatusEnum = z.enum(["TODO", "IN_PROGRESS", "DONE", "BLOCKED"]);
+ */
+export const TaskSchema = z.object({
+  title: z.string().max(255),
+  description: z.string().max(255).nullable(),
+  /*   status: StatusEnum.default("TODO"),
+   */ assignedToId: z.string().nullable(),
+  projectId: z.number().int().positive().nullable(),
+  teamId: z.number().int().positive().nullable(),
+  calendarId: z.number().int().positive().nullable(),
+  published: z.boolean().default(false),
+});
+
 export async function createTask(formData: FormData) {
-  const validatedFields = taskSchema.safeParse({
+  const validatedFields = TaskSchema.safeParse({
     title: formData.get("title"),
+    description: formData.get("description"),
+    assignedToId: formData.get("assignedToId"),
     projectId: formData.get("projectId"),
     teamId: formData.get("teamId"),
+    calendarId: formData.get("calendarId"),
     published: formData.get("published") === "true",
   });
 
@@ -67,10 +76,16 @@ export async function createTask(formData: FormData) {
       data: {
         ...validatedFields.data,
         ownerId: session.user.id,
+        assignedToId: validatedFields.data.assignedToId
+          ? validatedFields.data.assignedToId
+          : undefined,
         projectId: validatedFields.data.projectId
           ? Number(validatedFields.data.projectId)
           : undefined,
         teamId: validatedFields.data.teamId
+          ? Number(validatedFields.data.teamId)
+          : undefined,
+        calendarId: validatedFields.data.teamId
           ? Number(validatedFields.data.teamId)
           : undefined,
       },

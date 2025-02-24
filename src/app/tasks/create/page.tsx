@@ -1,6 +1,6 @@
 // app/tasks/create/page.tsx
 import { auth } from "@/lib/auth";
-import TaskCreateForm from "./TaskCreateForm";
+import TaskCreateForm from "../../../components/forms/TaskCreateForm";
 import { getProjects, getTeams } from "@/lib/data";
 
 export default async function TaskCreatePage() {

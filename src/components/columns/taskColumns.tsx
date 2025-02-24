@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import { FaCalendarAlt, FaTasks, FaUsers, FaInfoCircle } from "react-icons/fa";
 import Link from "next/link";
-import { TaskStatusSelector } from "../../components/status-selector";
+import { TaskStatusSelector } from "../status-selector";
 
 export const columns: ColumnDef<Task>[] = [
   {
