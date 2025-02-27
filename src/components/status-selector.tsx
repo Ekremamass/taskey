@@ -8,15 +8,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { updateTaskStatus } from "../actions/task";
 import { Status } from "@prisma/client";
+import { updateTaskStatus } from "@/actions/task";
+import { toast } from "sonner";
 
 export function TaskStatusSelector({
   initialStatus,
   taskId,
 }: {
   initialStatus: Status;
-  taskId: string;
+  taskId: number;
 }) {
   // Use a state to track whether component is mounted to prevent hydration mismatches
   const [isMounted, setIsMounted] = useState(false);
@@ -27,10 +28,15 @@ export function TaskStatusSelector({
   }, []);
 
   const handleStatusChange = async (newStatus: Status) => {
-    setStatus(newStatus);
-    await updateTaskStatus(taskId, newStatus);
+    try {
+      setStatus(newStatus);
+      await updateTaskStatus(taskId, newStatus);
+      toast("Status updated successfully");
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      toast("Failed to update status");
+    }
   };
-
   // Render nothing until mounted to prevent hydration issues
   if (!isMounted) return null;
 

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { inviteMember } from "@/actions/team";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -21,6 +20,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner"; // Import toast notifications
 import { z } from "zod";
+import { inviteMember } from "@/actions/team";
 
 type InviteMemberFormProps = {
   teamId: number;

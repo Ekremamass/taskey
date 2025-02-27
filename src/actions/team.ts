@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getUserTeamRole } from "@/actions/user";
-import { log } from "console";
+import { getSessionUser } from "@/lib/auth";
 
 export async function getTeamData(teamId: number, userId: string) {
   try {
@@ -49,13 +49,19 @@ export async function getTeamData(teamId: number, userId: string) {
  * @param role - Role in the team (default: CONTRIBUTOR).
  * @returns Invitation result or error message.
  */
+
 export const inviteMember = async (
   email: string,
   teamId: number,
-  assignedBy: string,
   role: "LEADER" | "CONTRIBUTOR" | "VIEWER" = "CONTRIBUTOR"
 ) => {
   try {
+    const assignedBy = await getSessionUser();
+
+    // Check if the user sending the invite is a leader
+    if (!assignedBy?.id || !isMemberLeader(assignedBy?.id, teamId)) {
+      return { error: "Login to show your teams." };
+    }
     // Find the user by email
     const user = await prisma.user.findUnique({
       where: { email },
@@ -79,26 +85,43 @@ export const inviteMember = async (
       return { error: "User is already a member of this team." };
     }
 
-    log("user.id: " + user.id);
-    log("teamId: " + teamId);
-    log("assignedBy: " + assignedBy);
-    log("role: " + role);
-
     // Add the user to the team
     await prisma.teamsOnUsers.create({
       data: {
         userId: user.id,
         teamId: teamId,
-        assignedBy: assignedBy,
+        assignedBy: assignedBy.id,
         role: role,
       },
     });
 
     // TODO: Send an invitation email here (use nodemailer, SendGrid, etc.)
-
     return { success: `User ${email} has been invited to the team.` };
   } catch (error) {
     console.error("Error inviting user:", error);
     return { error: "An error occurred while inviting the user." };
+  }
+};
+
+export const isMemberLeader = async (userId: string, teamId: number) => {
+  try {
+    const member = await prisma.teamsOnUsers.findUnique({
+      where: {
+        userId_teamId: {
+          userId: userId,
+          teamId: teamId,
+        },
+      },
+      select: {
+        role: true,
+      },
+    });
+
+    if (!member || member.role !== "LEADER") {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    return error;
   }
 };

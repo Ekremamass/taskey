@@ -5,7 +5,7 @@ import TaskCard from "@/app/tasks/TaskCard";
 import ToggleButton from "@/components/ToggleButton";
 import { redirect } from "next/navigation";
 import { DataTable } from "../../components/ui/data-table";
-import { columns } from "./columns";
+import { columns } from "@/components/columns/taskColumns";
 
 export default async function Page({
   searchParams,
@@ -21,7 +21,7 @@ export default async function Page({
 
     const tasks: Task[] = await prisma.task.findMany({
       where: {
-        userId: session.user.id,
+        ownerId: session.user.id,
       },
     });
 

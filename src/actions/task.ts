@@ -32,17 +32,23 @@ export async function updateTaskStatus(taskId: number, newStatus: Status) {
 }
 
 // Zod Schema
-/* const StatusEnum = z.enum(["TODO", "IN_PROGRESS", "DONE", "BLOCKED"]);
- */
-export const TaskSchema = z.object({
+const TaskSchema = z.object({
   title: z.string().max(255),
   description: z.string().max(255).nullable(),
-  /*   status: StatusEnum.default("TODO"),
-   */ assignedToId: z.string().nullable(),
-  projectId: z.number().int().positive().nullable(),
-  teamId: z.number().int().positive().nullable(),
-  calendarId: z.number().int().positive().nullable(),
-  published: z.boolean().default(false),
+  assignedToId: z.string().nullable(),
+  projectId: z.preprocess(
+    (val) => (val ? Number(val) : null),
+    z.number().int().positive().nullable()
+  ),
+  teamId: z.preprocess(
+    (val) => (val ? Number(val) : null),
+    z.number().int().positive().nullable()
+  ),
+  calendarId: z.preprocess(
+    (val) => (val ? Number(val) : null),
+    z.number().int().positive().nullable()
+  ),
+  published: z.preprocess((val) => val === "true", z.boolean().default(false)),
 });
 
 export async function createTask(formData: FormData) {
@@ -53,7 +59,7 @@ export async function createTask(formData: FormData) {
     projectId: formData.get("projectId"),
     teamId: formData.get("teamId"),
     calendarId: formData.get("calendarId"),
-    published: formData.get("published") === "true",
+    published: formData.get("published"),
   });
 
   if (!validatedFields.success) {
@@ -74,20 +80,14 @@ export async function createTask(formData: FormData) {
   try {
     const task = await prisma.task.create({
       data: {
-        ...validatedFields.data,
+        title: validatedFields.data.title,
+        description: validatedFields.data.description || null,
+        assignedToId: validatedFields.data.assignedToId || null,
+        projectId: validatedFields.data.projectId,
+        teamId: validatedFields.data.teamId,
+        calendarId: validatedFields.data.calendarId,
+        published: validatedFields.data.published,
         ownerId: session.user.id,
-        assignedToId: validatedFields.data.assignedToId
-          ? validatedFields.data.assignedToId
-          : undefined,
-        projectId: validatedFields.data.projectId
-          ? Number(validatedFields.data.projectId)
-          : undefined,
-        teamId: validatedFields.data.teamId
-          ? Number(validatedFields.data.teamId)
-          : undefined,
-        calendarId: validatedFields.data.teamId
-          ? Number(validatedFields.data.teamId)
-          : undefined,
       },
     });
 
@@ -96,6 +96,7 @@ export async function createTask(formData: FormData) {
       task,
     };
   } catch (error) {
+    console.error("Error creating task:", error);
     return {
       success: false,
       errors: {

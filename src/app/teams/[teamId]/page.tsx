@@ -3,10 +3,15 @@ import { auth } from "@/lib/auth";
 import { getTeamData } from "@/actions/team";
 import UserCard from "@/components/cards/UserCard";
 import { DataTable } from "@/components/ui/data-table";
-import { columns as taskColumns } from "@/app/tasks/columns";
-import { toast } from "sonner";
+import { columns } from "@/components/columns/taskColumns";
+import { Button, buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
 
-export default async function TeamPage({ params }: { params: { id: string } }) {
+export default async function TeamPage({
+  params,
+}: {
+  params: { teamId: string };
+}) {
   const session = await auth();
   const user = session?.user;
 
@@ -14,13 +19,14 @@ export default async function TeamPage({ params }: { params: { id: string } }) {
     return <div>Login to access team.</div>;
   }
 
+  const teamId = Number(await params.teamId);
+
   const { team, membersWithRoles, tasks, error } = await getTeamData(
-    Number(params.id),
+    teamId,
     user.id
   );
 
   if (error) {
-    toast(error);
     return <div>{error}</div>;
   }
 
@@ -51,9 +57,15 @@ export default async function TeamPage({ params }: { params: { id: string } }) {
 
       <div>
         <h2>Tasks</h2>
+        <Link
+          href={`/teams/${teamId}/createTask`}
+          className={buttonVariants({ variant: "outline" })}
+        >
+          Click here
+        </Link>
         {tasks.length > 0 ? (
           <div className="container mx-auto py-10">
-            <DataTable columns={taskColumns} data={tasks} />
+            <DataTable columns={columns} data={tasks} />
           </div>
         ) : (
           <div>No tasks</div>

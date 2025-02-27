@@ -1,9 +1,9 @@
-import { auth } from "@/lib/auth";
+import { auth, getSessionUser } from "@/lib/auth";
 import InviteMemberForm from "./form";
 
 export default async function TeamPage({ params }: { params: { id: string } }) {
-  const session = await auth();
-  const loggedInUserId = session?.user?.id; // Replace with actual logged-in user ID
+  const user = await getSessionUser();
+  const loggedInUserId = user?.id;
   if (loggedInUserId) {
     return (
       <div className="space-y-4">

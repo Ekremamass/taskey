@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -18,11 +18,9 @@ import { createTask } from "@/actions/task";
 export default function TaskCreateForm({
   projects,
   teams,
-  calendars,
 }: {
   projects: Array<{ id: number; name: string }>;
-  teams: Array<{ id: number; name: string }>;
-  calendars: Array<{ id: number; name: string }>;
+  teams?: Array<{ id: number; name: string }>;
 }) {
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,11 +28,23 @@ export default function TaskCreateForm({
   const params = useParams();
   const teamIdFromUrl = params?.teamId;
   const projectIdFromUrl = params?.projectId;
-  const calendarIdFromUrl = params?.calendarId;
 
-  async function handleSubmit(formData: FormData) {
+  useEffect(() => {
+    console.log("params:", params);
+    console.log("teamIdFromUrl:", teamIdFromUrl);
+  }, [params]);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setIsSubmitting(true);
     setErrors({});
+
+    const formData = new FormData(event.currentTarget);
+
+    // Add teamId to formData if it exists in the URL
+    if (teamIdFromUrl) {
+      formData.append("teamId", teamIdFromUrl);
+    }
 
     const result = await createTask(formData);
 
@@ -50,7 +60,7 @@ export default function TaskCreateForm({
 
   return (
     <div className="max-w-md mx-auto mt-10">
-      <form action={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="space-y-4">
           {/* Title Field */}
           <div>
@@ -73,26 +83,6 @@ export default function TaskCreateForm({
               <p className="text-red-500 text-sm mt-1">
                 {errors.description[0]}
               </p>
-            )}
-          </div>
-
-          {/* Assign To Select */}
-          <div>
-            <Label>Assign To</Label>
-            <Select name="assignedTo">
-              <SelectTrigger>
-                <SelectValue placeholder="Select a user to assign the task to" />
-              </SelectTrigger>
-              <SelectContent>
-                {projects.map((project) => (
-                  <SelectItem key={project.id} value={project.id.toString()}>
-                    {project.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.projectId && (
-              <p className="text-red-500 text-sm mt-1">{errors.projectId[0]}</p>
             )}
           </div>
 
@@ -137,33 +127,6 @@ export default function TaskCreateForm({
               {errors.projectId && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.projectId[0]}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Calendar Select - Hide if calendarId is in URL */}
-          {!calendarIdFromUrl && (
-            <div>
-              <Label>Calendar</Label>
-              <Select name="calendarId">
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a calendar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {calendars.map((calendar) => (
-                    <SelectItem
-                      key={calendar.id}
-                      value={calendar.id.toString()}
-                    >
-                      {calendar.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.calendarId && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.calendarId[0]}
                 </p>
               )}
             </div>
