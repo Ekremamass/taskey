@@ -23,7 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { TaskStatusSelector } from "@/components/status-selector";
+import { TaskStatusSelector } from "@/components/ui/status-selector";
 
 type TaskCardProps = {
   task: Task;

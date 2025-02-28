@@ -11,25 +11,43 @@ import {
 } from "@/components/ui/tooltip";
 import { FaCalendarAlt, FaTasks, FaUsers, FaInfoCircle } from "react-icons/fa";
 import Link from "next/link";
-import { TaskStatusSelector } from "../status-selector";
+import { TaskStatusSelector } from "../ui/status-selector";
+import { AssignToSelector } from "../ui/assign-to";
+import { useRouter } from "next/router";
+
+const router = useRouter();
+const isTeamPage = router.pathname.startsWith("/teams/");
 
 export const columns: ColumnDef<Task>[] = [
   {
     accessorKey: "title",
     header: "Title",
-    size: 400, // Increase width for title
+    size: 400,
     cell: ({ row }) => <div className="truncate">{row.original.title}</div>,
   },
   {
     accessorKey: "status",
     header: "Status",
-    size: 100, // Decrease width for status selector
+    size: 100,
     cell: ({ row }) => (
       <TaskStatusSelector
         initialStatus={row.original.status}
         taskId={row.original.id}
       />
     ),
+  },
+  {
+    accessorKey: "assignedTo",
+    header: "Assign To",
+    size: 100,
+    cell: ({ row }) => {
+      return isTeamPage ? (
+        <AssignToSelector
+          assignedToId={row.original.assignedToId ?? "Unassigned"}
+          taskId={row.original.id}
+        />
+      ) : null;
+    },
   },
   {
     header: "Actions",
