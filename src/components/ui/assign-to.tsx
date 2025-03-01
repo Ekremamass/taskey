@@ -8,33 +8,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Status, User } from "@prisma/client";
-import { updateTaskStatus } from "@/actions/task";
+import { Status } from "@prisma/client";
+import { updateAssignedTo, updateTaskStatus } from "@/actions/task";
 import { toast } from "sonner";
 
 export function AssignToSelector({
-  assignedToId,
+  initAssignedToId,
   taskId,
 }: {
-  assignedToId: String;
+  initAssignedToId: string;
   taskId: number;
 }) {
   // Use a state to track whether component is mounted to prevent hydration mismatches
   const [isMounted, setIsMounted] = useState(false);
-  const [status, setStatus] = useState(assignedToId);
+  const [assignedTo, setAssignedTo] = useState(initAssignedToId);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const handleStatusChange = async (newStatus: Status) => {
+  const handleAssignedChange = async (newUserId: string) => {
     try {
-      setStatus(newStatus);
-      await updateTaskStatus(taskId, newStatus);
-      toast("Status updated successfully");
+      setAssignedTo(newUserId);
+      await updateAssignedTo(taskId, newUserId);
+      toast("Task assigned to user successfully");
     } catch (error) {
-      console.error("Failed to update status:", error);
-      toast("Failed to update status");
+      console.error("Failed to assign task:", error);
+      toast("Failed to assign task");
     }
   };
   // Render nothing until mounted to prevent hydration issues
@@ -56,7 +56,7 @@ export function AssignToSelector({
   };
 
   return (
-    <Select value={status} onValueChange={handleStatusChange}>
+    <Select value={status} onValueChange={handleAssignedChange}>
       <SelectTrigger className={`w-full ${getStatusStyles(status)}`}>
         <SelectValue placeholder="Select status" />
       </SelectTrigger>

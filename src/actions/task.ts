@@ -105,3 +105,45 @@ export async function createTask(formData: FormData) {
     };
   }
 }
+
+export async function updateAssignedTo(taskId: number, newUserId: string) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("User not authenticated");
+  } 
+
+  const currTask = await prisma.task.findUnique({ where: { id: taskId } });
+  if (!currTask) {
+    throw new Error("Task not found");
+  }
+
+  if (session.user.id !== currTask.ownerId) {
+    throw new Error("Unauthorized");
+  }
+
+
+  
+  if (!currTask.teamId) {
+    throw new Error("Task does not have a team assigned");
+  }
+
+  const teamOnUser = await prisma.teamsOnUsers.findUnique({
+    where: {
+      userId_teamId: {
+        userId: newUserId,
+        teamId: currTask.teamId,
+      },
+    },
+  });
+  
+  if(!teamOnUser){
+    throw new Error("User isnt a member of the team");
+  }
+
+  await prisma.task.update({
+    where: { id: taskId },
+    data: { assignedToId: newUserId },
+  });
+}
+

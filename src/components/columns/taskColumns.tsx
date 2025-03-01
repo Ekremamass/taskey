@@ -43,7 +43,7 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => {
       return isTeamPage ? (
         <AssignToSelector
-          assignedToId={row.original.assignedToId ?? "Unassigned"}
+          initAssignedToId={row.original.assignedToId ?? "Unassigned"}
           taskId={row.original.id}
         />
       ) : null;
