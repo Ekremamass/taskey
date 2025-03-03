@@ -16,32 +16,33 @@ export default async function TeamPage({
   const user = session?.user;
 
   if (!user?.id) {
-    return <div>Login to access team.</div>;
+    return <div className="text-center p-4">Login to access team.</div>;
   }
 
-  const teamId = Number(params.teamId);
-
+  const teamId = Number(await params.teamId);
   const { team, membersWithRoles, tasks, error } = await getTeamData(
     teamId,
     user.id
   );
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="text-center p-4">{error}</div>;
   }
 
   if (!team) {
-    return <div>Team not found.</div>;
+    return <div className="text-center p-4">Team not found.</div>;
   }
 
   return (
-    <main className="max-w-xl">
-      <h1 className="mb-4 text-xl md:text-2xl">Team {team.name}</h1>
+    <main className="max-w-4xl mx-auto px-4">
+      <h1 className="mb-4 text-xl sm:text-2xl font-semibold">
+        Team {team.name}
+      </h1>
 
-      <div className="mb-4">
-        <h2 className="mb-4">Members</h2>
+      <div className="mb-6">
+        <h2 className="mb-3 text-lg font-medium">Members</h2>
         {membersWithRoles.length > 0 ? (
-          <div className="flex-none">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {membersWithRoles.map((member) => (
               <UserCard
                 key={member.user.id}
@@ -51,24 +52,26 @@ export default async function TeamPage({
             ))}
           </div>
         ) : (
-          <div>No members</div>
+          <div className="text-gray-500">No members</div>
         )}
       </div>
 
       <div>
-        <h2>Tasks</h2>
+        <h2 className="mb-3 text-lg font-medium">Tasks</h2>
         <Link
           href={`/teams/${teamId}/createTask`}
-          className={buttonVariants({ variant: "outline" })}
+          className={`${buttonVariants({
+            variant: "outline",
+          })} w-full sm:w-auto`}
         >
-          Click here
+          Add Task
         </Link>
         {tasks.length > 0 ? (
-          <div className="container mx-auto py-10">
+          <div className="overflow-x-auto mt-4">
             <DataTable columns={columns} data={tasks} />
           </div>
         ) : (
-          <div>No tasks</div>
+          <div className="text-gray-500 mt-2">No tasks</div>
         )}
       </div>
     </main>
