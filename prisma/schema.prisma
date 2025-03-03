@@ -20,6 +20,8 @@ model User {
     ownedTasks    Task[]         @relation("OwnedTasks")
     assignedTasks Task[]         @relation("AssignedTasks")
     teams         TeamsOnUsers[]
+    teamsMax      Int            @default(3)
+    teamsCount    Int            @default(0)
 
     accounts Account[]
     sessions Session[]
@@ -34,6 +36,7 @@ model User {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+    Team      Team[]
 
     @@index([email])
 }
@@ -96,6 +99,8 @@ enum MemberRole {
 model Team {
     id       Int            @id @default(autoincrement())
     name     String
+    owner    User           @relation(fields: [ownerId], references: [id])
+    ownerId  String
     users    TeamsOnUsers[]
     tasks    Task[]
     projects Project[]

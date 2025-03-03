@@ -4,6 +4,57 @@ import { prisma } from "@/lib/prisma";
 import { getUserTeamRole } from "@/actions/user";
 import { getSessionUser } from "@/lib/auth";
 import { cache } from "react";
+import { TeamSchema } from "@/schemas/teamSchema";
+
+export async function createTeam(formData: FormData) {
+  const validatedFields = TeamSchema.safeParse({
+    name: formData.get("name"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  const user = await getSessionUser();
+  if (!user?.id) {
+    return {
+      success: false,
+      errors: { general: ["User not authenticated"] },
+    };
+  }
+
+  if (user.teamsCount >= user.teamsMax) {
+    return {
+      success: false,
+      errors: { general: ["You have reached the maximum number of teams"] },
+    };
+  }
+
+  try {
+    const team = await prisma.team.create({
+      data: {
+        name: validatedFields.data.name,
+        ownerId: user.id,
+      },
+    });
+
+    return {
+      success: true,
+      team,
+    };
+  } catch (error) {
+    console.error("Error creating team:", error);
+    return {
+      success: false,
+      errors: {
+        general: ["Failed to create team"],
+      },
+    };
+  }
+}
 
 export async function getTeamData(teamId: number, userId: string) {
   try {

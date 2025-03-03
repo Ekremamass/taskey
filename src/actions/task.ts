@@ -2,8 +2,8 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { TaskSchema } from "@/schemas/taskSchema";
 import { Status } from "@prisma/client";
-import { z } from "zod";
 
 export async function updateTaskStatus(taskId: number, newStatus: Status) {
   const session = await auth();
@@ -30,26 +30,6 @@ export async function updateTaskStatus(taskId: number, newStatus: Status) {
     data: { status: newStatus },
   });
 }
-
-// Zod Schema
-const TaskSchema = z.object({
-  title: z.string().max(255),
-  description: z.string().max(255).nullable(),
-  assignedToId: z.string().nullable(),
-  projectId: z.preprocess(
-    (val) => (val ? Number(val) : null),
-    z.number().int().positive().nullable()
-  ),
-  teamId: z.preprocess(
-    (val) => (val ? Number(val) : null),
-    z.number().int().positive().nullable()
-  ),
-  calendarId: z.preprocess(
-    (val) => (val ? Number(val) : null),
-    z.number().int().positive().nullable()
-  ),
-  published: z.preprocess((val) => val === "true", z.boolean().default(false)),
-});
 
 export async function createTask(formData: FormData) {
   const validatedFields = TaskSchema.safeParse({
@@ -83,9 +63,15 @@ export async function createTask(formData: FormData) {
         title: validatedFields.data.title,
         description: validatedFields.data.description || null,
         assignedToId: validatedFields.data.assignedToId || null,
-        projectId: validatedFields.data.projectId,
-        teamId: validatedFields.data.teamId,
-        calendarId: validatedFields.data.calendarId,
+        projectId: validatedFields.data.projectId
+          ? Number(validatedFields.data.projectId)
+          : undefined,
+        teamId: validatedFields.data.teamId
+          ? Number(validatedFields.data.teamId)
+          : undefined,
+        calendarId: validatedFields.data.calendarId
+          ? Number(validatedFields.data.calendarId)
+          : undefined,
         published: validatedFields.data.published,
         ownerId: session.user.id,
       },
@@ -111,7 +97,7 @@ export async function updateAssignedTo(taskId: number, newUserId: string) {
 
   if (!session?.user?.id) {
     throw new Error("User not authenticated");
-  } 
+  }
 
   const currTask = await prisma.task.findUnique({ where: { id: taskId } });
   if (!currTask) {
@@ -122,8 +108,6 @@ export async function updateAssignedTo(taskId: number, newUserId: string) {
     throw new Error("Unauthorized");
   }
 
-
-  
   if (!currTask.teamId) {
     throw new Error("Task does not have a team assigned");
   }
@@ -136,8 +120,8 @@ export async function updateAssignedTo(taskId: number, newUserId: string) {
       },
     },
   });
-  
-  if(!teamOnUser){
+
+  if (!teamOnUser) {
     throw new Error("User isnt a member of the team");
   }
 
@@ -146,4 +130,3 @@ export async function updateAssignedTo(taskId: number, newUserId: string) {
     data: { assignedToId: newUserId },
   });
 }
-
