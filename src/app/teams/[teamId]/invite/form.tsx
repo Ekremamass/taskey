@@ -24,7 +24,7 @@ import { inviteMember } from "@/actions/team";
 
 type InviteMemberFormProps = {
   teamId: number;
-  assignedBy: string; // ID of the logged-in user
+  assignedBy: string;
 };
 
 // Zod schema for email validation
@@ -45,7 +45,7 @@ const InviteMemberForm: React.FC<InviteMemberFormProps> = ({
       emailSchema.parse(email); // Validate email
       setLoading(true); // Set loading state
 
-      const response = await inviteMember(email, teamId, assignedBy, role);
+      const response = await inviteMember(email, teamId, role);
 
       if (response.error) {
         toast.error(response.error);

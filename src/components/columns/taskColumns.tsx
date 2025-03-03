@@ -13,10 +13,7 @@ import { FaCalendarAlt, FaTasks, FaUsers, FaInfoCircle } from "react-icons/fa";
 import Link from "next/link";
 import { TaskStatusSelector } from "../ui/status-selector";
 import { AssignToSelector } from "../ui/assign-to";
-import { useRouter } from "next/router";
-
-const router = useRouter();
-const isTeamPage = router.pathname.startsWith("/teams/");
+import { usePathname } from "next/navigation";
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -41,12 +38,12 @@ export const columns: ColumnDef<Task>[] = [
     header: "Assign To",
     size: 100,
     cell: ({ row }) => {
-      return isTeamPage ? (
+      return (
         <AssignToSelector
           initAssignedToId={row.original.assignedToId ?? "Unassigned"}
           taskId={row.original.id}
         />
-      ) : null;
+      );
     },
   },
   {

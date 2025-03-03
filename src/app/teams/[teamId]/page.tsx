@@ -19,7 +19,7 @@ export default async function TeamPage({
     return <div>Login to access team.</div>;
   }
 
-  const teamId = Number(await params.teamId);
+  const teamId = Number(params.teamId);
 
   const { team, membersWithRoles, tasks, error } = await getTeamData(
     teamId,

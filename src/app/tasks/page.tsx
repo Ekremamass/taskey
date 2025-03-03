@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Task } from "@prisma/client";
 import TaskCard from "@/app/tasks/TaskCard";
-import ToggleButton from "@/components/ToggleButton";
+import ToggleButton from "@/components/ui/ToggleButton";
 import { redirect } from "next/navigation";
 import { DataTable } from "../../components/ui/data-table";
 import { columns } from "@/components/columns/taskColumns";

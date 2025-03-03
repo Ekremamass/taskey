@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getUserTeamRole } from "@/actions/user";
 import { getSessionUser } from "@/lib/auth";
+import { cache } from "react";
 
 export async function getTeamData(teamId: number, userId: string) {
   try {
@@ -53,7 +54,7 @@ export async function getTeamData(teamId: number, userId: string) {
 export const inviteMember = async (
   email: string,
   teamId: number,
-  role: "LEADER" | "CONTRIBUTOR" | "VIEWER" = "CONTRIBUTOR"
+  memberRole: "LEADER" | "CONTRIBUTOR" | "VIEWER" = "CONTRIBUTOR"
 ) => {
   try {
     const assignedBy = await getSessionUser();
@@ -91,7 +92,7 @@ export const inviteMember = async (
         userId: user.id,
         teamId: teamId,
         assignedBy: assignedBy.id,
-        role: role,
+        role: memberRole,
       },
     });
 
@@ -125,3 +126,36 @@ export const isMemberLeader = async (userId: string, teamId: number) => {
     return error;
   }
 };
+
+/**
+ * Fetches the team members associated with a given task.
+ * Ensures that the task exists and belongs to a valid team before querying.
+ * @param taskId - The ID of the task to retrieve team members for.
+ * @returns List of team members or an empty array if no team is found.
+ */
+export const getTeamMembersByTaskId = cache(async (taskId: number) => {
+  if (!taskId || isNaN(taskId)) {
+    throw new Error("Invalid task ID");
+  }
+
+  const task = await prisma.task.findUnique({
+    where: { id: taskId },
+    select: { teamId: true },
+  });
+
+  if (!task || !task.teamId) {
+    return []; // No team associated with the task
+  }
+
+  return await prisma.teamsOnUsers.findMany({
+    where: { teamId: task.teamId },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+});

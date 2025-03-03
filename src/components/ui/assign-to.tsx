@@ -8,9 +8,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Status } from "@prisma/client";
-import { updateAssignedTo, updateTaskStatus } from "@/actions/task";
 import { toast } from "sonner";
+import { updateAssignedTo } from "@/actions/task";
+import { getTeamMembersByTaskId } from "@/actions/team";
+import { usePathname } from "next/navigation";
+
+// Define a type for team members
+interface User {
+  id: string;
+  name: string;
+}
 
 export function AssignToSelector({
   initAssignedToId,
@@ -19,13 +26,34 @@ export function AssignToSelector({
   initAssignedToId: string;
   taskId: number;
 }) {
-  // Use a state to track whether component is mounted to prevent hydration mismatches
   const [isMounted, setIsMounted] = useState(false);
   const [assignedTo, setAssignedTo] = useState(initAssignedToId);
+  const [teamMembers, setTeamMembers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+
+    async function fetchTeamMembers() {
+      try {
+        const members = await getTeamMembersByTaskId(taskId);
+
+        const formattedMembers = members.map((member) => ({
+          id: member.user.id,
+          name: member.user.name || "Unnamed User",
+        }));
+
+        setTeamMembers(formattedMembers);
+      } catch (err) {
+        setError("Failed to load team members.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchTeamMembers();
+  }, [taskId]);
 
   const handleAssignedChange = async (newUserId: string) => {
     try {
@@ -37,45 +65,40 @@ export function AssignToSelector({
       toast("Failed to assign task");
     }
   };
-  // Render nothing until mounted to prevent hydration issues
+
+  const pathname = usePathname();
+
+  const isTeamPage = pathname.startsWith("/teams/");
+
   if (!isMounted) return null;
 
-  const getStatusStyles = (status: Status) => {
-    switch (status) {
-      case "TODO":
-        return "bg-blue-100 text-blue-500";
-      case "IN_PROGRESS":
-        return "bg-yellow-100 text-yellow-500";
-      case "DONE":
-        return "bg-green-100 text-green-500";
-      case "BLOCKED":
-        return "bg-red-100 text-red-500";
-      default:
-        return "";
-    }
-  };
+  if (!isTeamPage) return null;
 
   return (
-    <Select value={status} onValueChange={handleAssignedChange}>
-      <SelectTrigger className={`w-full ${getStatusStyles(status)}`}>
-        <SelectValue placeholder="Select status" />
+    <Select value={assignedTo} onValueChange={handleAssignedChange}>
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Assign to" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="TODO" className="bg-blue-100 text-blue-500">
-          TODO
-        </SelectItem>
-        <SelectItem
-          value="IN_PROGRESS"
-          className="bg-yellow-100 text-yellow-500"
-        >
-          IN PROGRESS
-        </SelectItem>
-        <SelectItem value="DONE" className="bg-green-100 text-green-500">
-          DONE
-        </SelectItem>
-        <SelectItem value="BLOCKED" className="bg-red-100 text-red-500">
-          BLOCKED
-        </SelectItem>
+        {loading ? (
+          <SelectItem value="loading" disabled>
+            Loading...
+          </SelectItem>
+        ) : error ? (
+          <SelectItem value="error" disabled>
+            {error}
+          </SelectItem>
+        ) : teamMembers.length > 0 ? (
+          teamMembers.map((member) => (
+            <SelectItem key={member.id} value={member.id}>
+              {member.name}
+            </SelectItem>
+          ))
+        ) : (
+          <SelectItem value="noTeamMember" disabled>
+            No team members found
+          </SelectItem>
+        )}
       </SelectContent>
     </Select>
   );
