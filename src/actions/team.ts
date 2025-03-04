@@ -41,6 +41,20 @@ export async function createTeam(formData: FormData) {
       },
     });
 
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { teamsCount: { increment: 1 } },
+    });
+
+    await prisma.teamsOnUsers.create({
+      data: {
+        userId: user.id,
+        teamId: team.id,
+        role: "LEADER",
+        assignedBy: user.id,
+      },
+    });
+
     return {
       success: true,
       team,

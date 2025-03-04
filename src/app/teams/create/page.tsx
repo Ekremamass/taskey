@@ -1,8 +1,6 @@
-// app/tasks/create/page.tsx
-import TaskCreateForm from "@/components/forms/TaskCreateForm";
-import { getSessionUser } from "@/lib/auth";
-import { getTeamProjects } from "@/lib/data";
-import { prisma } from "@/lib/prisma";
+// app/teams/create/page.tsx
+import TeamCreateForm from "@/components/forms/TeamCreateForm";
+import { auth, getSessionUser } from "@/lib/auth";
 
 export default async function TaskCreatePage() {
   const user = await getSessionUser();
@@ -10,5 +8,5 @@ export default async function TaskCreatePage() {
     return <div>Please sign in to create a team</div>;
   }
 
-  return <TeamCreateForm user={user} />;
+  return <TeamCreateForm />;
 }
