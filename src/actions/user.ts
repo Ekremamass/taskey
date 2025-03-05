@@ -88,3 +88,10 @@ export async function getUserTeamRole(userId: string, teamId: number) {
     select: { role: true },
   });
 }
+
+export async function getUserNameById(userId: string) {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    select: { name: true },
+  });
+}
