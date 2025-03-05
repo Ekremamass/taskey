@@ -7,6 +7,11 @@ import { cache } from "react";
 import { TeamSchema } from "@/schemas/teamSchema";
 import { Team } from "@prisma/client";
 
+/**
+ * Create a new team.
+ * @param formData - Form data containing the team name.
+ * @returns The created team or an error message.
+ */
 export async function createTeam(formData: FormData) {
   const validatedFields = TeamSchema.safeParse({
     name: formData.get("name"),
@@ -71,6 +76,12 @@ export async function createTeam(formData: FormData) {
   }
 }
 
+/**
+ * Get data for a specific team.
+ * @param teamId - ID of the team.
+ * @param userId - ID of the user requesting the data.
+ * @returns The team data or an error message.
+ */
 export async function getTeamData(teamId: number, userId: string) {
   try {
     const team = await prisma.team.findUnique({ where: { id: teamId } });
@@ -112,11 +123,9 @@ export async function getTeamData(teamId: number, userId: string) {
  * Invite a user to a team via email.
  * @param email - Email of the user to invite.
  * @param teamId - ID of the team.
- * @param assignedBy - ID of the user sending the invite.
- * @param role - Role in the team (default: CONTRIBUTOR).
+ * @param memberRole - Role in the team (default: CONTRIBUTOR).
  * @returns Invitation result or error message.
  */
-
 export const inviteMember = async (
   email: string,
   teamId: number,
@@ -129,6 +138,7 @@ export const inviteMember = async (
     if (!assignedBy?.id || !isMemberLeader(assignedBy?.id, teamId)) {
       return { error: "Login to show your teams." };
     }
+
     // Find the user by email
     const user = await prisma.user.findUnique({
       where: { email },
@@ -170,6 +180,12 @@ export const inviteMember = async (
   }
 };
 
+/**
+ * Check if a user is a leader of a team.
+ * @param userId - ID of the user.
+ * @param teamId - ID of the team.
+ * @returns True if the user is a leader, false otherwise.
+ */
 export const isMemberLeader = async (userId: string, teamId: number) => {
   try {
     const member = await prisma.teamsOnUsers.findUnique({
@@ -189,7 +205,8 @@ export const isMemberLeader = async (userId: string, teamId: number) => {
     }
     return true;
   } catch (error) {
-    return error;
+    console.error("Error checking if user is a leader:", error);
+    return false;
   }
 };
 
@@ -226,6 +243,10 @@ export const getTeamMembersByTaskId = cache(async (taskId: number) => {
   });
 });
 
+/**
+ * Get the teams of the current user.
+ * @returns The teams of the user or an error message.
+ */
 export async function getUserTeams() {
   const user = await getSessionUser();
 
@@ -236,14 +257,14 @@ export async function getUserTeams() {
     };
   }
 
-  let teams: { team: Team }[] = [];
   try {
-    teams = await prisma.teamsOnUsers.findMany({
+    const teams = await prisma.teamsOnUsers.findMany({
       where: { userId: user.id },
       include: { team: true },
     });
     return teams;
   } catch (error) {
+    console.error("Error fetching user teams:", error);
     return {
       success: false,
       error: (error as any).message,
@@ -251,6 +272,10 @@ export async function getUserTeams() {
   }
 }
 
+/**
+ * Get the names of the teams the current user is a member of.
+ * @returns The names of the teams.
+ */
 export async function getTeamsNames() {
   const user = await getSessionUser();
 
@@ -258,23 +283,33 @@ export async function getTeamsNames() {
     return [];
   }
 
-  const teams = await prisma.team.findMany({
-    where: {
-      users: {
-        some: {
-          userId: user.id,
+  try {
+    const teams = await prisma.team.findMany({
+      where: {
+        users: {
+          some: {
+            userId: user.id,
+          },
         },
       },
-    },
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+      select: {
+        id: true,
+        name: true,
+      },
+    });
 
-  return teams;
+    return teams;
+  } catch (error) {
+    console.error("Error fetching team names:", error);
+    return [];
+  }
 }
 
+/**
+ * Delete a team.
+ * @param teamId - ID of the team to delete.
+ * @returns Success or error message.
+ */
 export async function deleteTeam(teamId: number) {
   const user = await getSessionUser();
 
