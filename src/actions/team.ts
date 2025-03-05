@@ -5,6 +5,7 @@ import { getUserTeamRole } from "@/actions/user";
 import { getSessionUser } from "@/lib/auth";
 import { cache } from "react";
 import { TeamSchema } from "@/schemas/teamSchema";
+import { Team } from "@prisma/client";
 
 export async function createTeam(formData: FormData) {
   const validatedFields = TeamSchema.safeParse({
@@ -224,3 +225,105 @@ export const getTeamMembersByTaskId = cache(async (taskId: number) => {
     },
   });
 });
+
+export async function getUserTeams() {
+  const user = await getSessionUser();
+
+  if (!user?.id) {
+    return {
+      success: false,
+      error: "User not authenticated",
+    };
+  }
+
+  let teams: { team: Team }[] = [];
+  try {
+    teams = await prisma.teamsOnUsers.findMany({
+      where: { userId: user.id },
+      include: { team: true },
+    });
+    return teams;
+  } catch (error) {
+    return {
+      success: false,
+      error: (error as any).message,
+    };
+  }
+}
+
+export async function getTeamsNames() {
+  const user = await getSessionUser();
+
+  if (!user?.id) {
+    return [];
+  }
+
+  const teams = await prisma.team.findMany({
+    where: {
+      users: {
+        some: {
+          userId: user.id,
+        },
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  return teams;
+}
+
+export async function deleteTeam(teamId: number) {
+  const user = await getSessionUser();
+
+  if (!user?.id) {
+    return {
+      success: false,
+      error: "User not authenticated",
+    };
+  }
+
+  // Check if the user is the owner of the team
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
+  });
+
+  if (!team) {
+    return {
+      success: false,
+      error: "Team not found",
+    };
+  }
+
+  if (team.ownerId !== user.id) {
+    return {
+      success: false,
+      error: "You are not authorized to delete this team",
+    };
+  }
+
+  try {
+    // Delete the team
+    await prisma.team.delete({
+      where: { id: teamId },
+    });
+
+    // Update the user's teams count
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { teamsCount: { decrement: 1 } },
+    });
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error deleting team:", error);
+    return {
+      success: false,
+      error: "Failed to delete team",
+    };
+  }
+}
