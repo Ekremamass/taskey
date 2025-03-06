@@ -96,41 +96,6 @@ enum MemberRole {
     VIEWER
 }
 
-model Team {
-    id       Int            @id @default(autoincrement())
-    name     String
-    owner    User           @relation(fields: [ownerId], references: [id])
-    ownerId  String
-    users    TeamsOnUsers[]
-    tasks    Task[]
-    projects Project[]
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @default(now()) @updatedAt
-}
-
-model TeamsOnUsers {
-    user   User   @relation(fields: [userId], references: [id])
-    userId String
-
-    role MemberRole @default(CONTRIBUTOR)
-
-    team   Team @relation(fields: [teamId], references: [id])
-    teamId Int
-
-    assignedAt DateTime @default(now())
-    assignedBy String
-
-    @@id([userId, teamId])
-}
-
-enum Status {
-    TODO
-    IN_PROGRESS
-    DONE
-    BLOCKED
-}
-
 model Task {
     id          Int     @id @default(autoincrement())
     title       String  @db.VarChar(255)
@@ -157,6 +122,55 @@ model Task {
     @@index([projectId])
     @@index([teamId])
     @@index([calendarId])
+}
+
+model Team {
+    id       Int            @id @default(autoincrement())
+    name     String
+    owner    User           @relation(fields: [ownerId], references: [id])
+    ownerId  String
+    users    TeamsOnUsers[]
+    tasks    Task[]
+    projects Project[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+}
+
+model TeamInvitations {
+    userId     String
+    teamId     Int
+    assignedBy String
+    role       String
+    status     String
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    @@id([userId, teamId])
+    @@index([teamId])
+    @@index([userId])
+}
+
+model TeamsOnUsers {
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
+
+    role MemberRole @default(CONTRIBUTOR)
+
+    team   Team @relation(fields: [teamId], references: [id])
+    teamId Int
+
+    assignedAt DateTime @default(now())
+    assignedBy String
+
+    @@id([userId, teamId])
+}
+
+enum Status {
+    TODO
+    IN_PROGRESS
+    DONE
+    BLOCKED
 }
 
 model Project {

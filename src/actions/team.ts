@@ -6,6 +6,9 @@ import { getSessionUser } from "@/lib/auth";
 import { cache } from "react";
 import { TeamSchema } from "@/schemas/teamSchema";
 import { Team } from "@prisma/client";
+import { isMemberLeader } from "@/actions/team";
+import { resend } from "@/lib/resend"; // Assuming you have a resend library
+import { io } from "@/lib/socket"; // Assuming you have a socket library
 
 /**
  * Create a new team.
@@ -135,7 +138,7 @@ export const inviteMember = async (
     const assignedBy = await getSessionUser();
 
     // Check if the user sending the invite is a leader
-    if (!assignedBy?.id || !isMemberLeader(assignedBy?.id, teamId)) {
+    if (!assignedBy?.id || !(await isMemberLeader(assignedBy?.id, teamId))) {
       return { error: "Login to show your teams." };
     }
 
@@ -162,17 +165,32 @@ export const inviteMember = async (
       return { error: "User is already a member of this team." };
     }
 
-    // Add the user to the team
-    await prisma.teamsOnUsers.create({
+    // Create an invitation record
+    await prisma.teamInvitations.create({
       data: {
         userId: user.id,
         teamId: teamId,
         assignedBy: assignedBy.id,
         role: memberRole,
+        status: "PENDING",
       },
     });
 
-    // TODO: Send an invitation email here (use nodemailer, SendGrid, etc.)
+    // Send an invitation email using Resend
+    await resend.sendEmail({
+      to: email,
+      subject: "Team Invitation",
+      text: `You have been invited to join the team. Please accept the invitation.`,
+      html: `<p>You have been invited to join the team. Please <a href="https://yourapp.com/accept-invite?teamId=${teamId}&userId=${user.id}">accept the invitation</a>.</p>`,
+    });
+
+    // Send a Socket.IO message
+    io.to(user.id).emit("team-invite", {
+      teamId,
+      userId: user.id,
+      role: memberRole,
+    });
+
     return { success: `User ${email} has been invited to the team.` };
   } catch (error) {
     console.error("Error inviting user:", error);
@@ -362,3 +380,54 @@ export async function deleteTeam(teamId: number) {
     };
   }
 }
+
+/**
+ * Accept a team invitation.
+ * @param userId - ID of the user accepting the invitation.
+ * @param teamId - ID of the team.
+ * @returns Success or error message.
+ */
+export const acceptInvite = async (userId: string, teamId: number) => {
+  try {
+    const invitation = await prisma.teamInvitations.findUnique({
+      where: {
+        userId_teamId: {
+          userId,
+          teamId,
+        },
+      },
+    });
+
+    if (!invitation || invitation.status !== "PENDING") {
+      return { error: "Invalid or expired invitation." };
+    }
+
+    // Add the user to the team
+    await prisma.teamsOnUsers.create({
+      data: {
+        userId: userId,
+        teamId: teamId,
+        assignedBy: invitation.assignedBy,
+        role: invitation.role,
+      },
+    });
+
+    // Update the invitation status
+    await prisma.teamInvitations.update({
+      where: {
+        userId_teamId: {
+          userId,
+          teamId,
+        },
+      },
+      data: {
+        status: "ACCEPTED",
+      },
+    });
+
+    return { success: "You have successfully joined the team." };
+  } catch (error) {
+    console.error("Error accepting invitation:", error);
+    return { error: "An error occurred while accepting the invitation." };
+  }
+};
