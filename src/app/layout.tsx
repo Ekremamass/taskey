@@ -38,7 +38,7 @@ export default function RootLayout({
                       <Breadcrumbs />
                     </div>
                     <div className="p-8">
-                    <ModeToggle />
+                      <ModeToggle />
                     </div>
                   </div>
                 </header>

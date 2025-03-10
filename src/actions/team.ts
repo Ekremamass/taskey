@@ -5,10 +5,11 @@ import { getUserTeamRole } from "@/actions/user";
 import { getSessionUser } from "@/lib/auth";
 import { cache } from "react";
 import { TeamSchema } from "@/schemas/teamSchema";
-import { Team } from "@prisma/client";
-import { isMemberLeader } from "@/actions/team";
-import { resend } from "@/lib/resend"; // Assuming you have a resend library
-import { io } from "@/lib/socket"; // Assuming you have a socket library
+import { MemberRole } from "@prisma/client";
+import { Resend } from "resend";
+import InviteUserEmail from "@/components/emails/invite-member";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
  * Create a new team.
@@ -165,6 +166,14 @@ export const inviteMember = async (
       return { error: "User is already a member of this team." };
     }
 
+    const team = await prisma.team.findUnique({
+      where: { id: teamId },
+    });
+
+    if (!team) {
+      return { error: "Team not found." };
+    }
+
     // Create an invitation record
     await prisma.teamInvitations.create({
       data: {
@@ -176,19 +185,25 @@ export const inviteMember = async (
       },
     });
 
-    // Send an invitation email using Resend
-    await resend.sendEmail({
-      to: email,
-      subject: "Team Invitation",
-      text: `You have been invited to join the team. Please accept the invitation.`,
-      html: `<p>You have been invited to join the team. Please <a href="https://yourapp.com/accept-invite?teamId=${teamId}&userId=${user.id}">accept the invitation</a>.</p>`,
-    });
+    // Generate the invite URL
+    const inviteUrl = `${process.env.BASE_URL}/invite?teamId=${teamId}&userId=${user.id}`;
 
-    // Send a Socket.IO message
-    io.to(user.id).emit("team-invite", {
-      teamId,
-      userId: user.id,
-      role: memberRole,
+    await resend.emails.send({
+      from: `Ekrema < ${process.env.EMAIL_FROM}>`,
+      to: email,
+      subject: "Taskey Team Invitation",
+      react: InviteUserEmail({
+        username: user.name ?? "User",
+        userImage:
+          user.image ?? "https://cdn-icons-png.flaticon.com/512/47/47774.png",
+        invitedByUsername: assignedBy.name ?? "User",
+        invitedByEmail: assignedBy.email ?? "example@example.com",
+        teamName: team.name,
+        teamImage: team.image,
+        inviteLink: inviteUrl,
+        inviteFromIp: "test",
+        inviteFromLocation: "test",
+      }),
     });
 
     return { success: `User ${email} has been invited to the team.` };
@@ -408,7 +423,7 @@ export const acceptInvite = async (userId: string, teamId: number) => {
         userId: userId,
         teamId: teamId,
         assignedBy: invitation.assignedBy,
-        role: invitation.role,
+        role: invitation.role as MemberRole,
       },
     });
 
