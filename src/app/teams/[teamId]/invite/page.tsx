@@ -8,12 +8,12 @@ export default async function TeamPage({
 }) {
   const user = await getSessionUser();
   const loggedInUserId = user?.id;
-  const teamId = Number(params.teamId);
+  const teamId = Number(await params.teamId);
 
   if (loggedInUserId) {
     return (
       <div className="space-y-4">
-        <h1 className="text-xl font-bold">Team {params.teamId}</h1>
+        <h1 className="text-xl font-bold">Team {teamId}</h1>
         <InviteMemberForm
           teamId={teamId}
           assignedBy={loggedInUserId as string}

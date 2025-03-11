@@ -186,11 +186,12 @@ export const inviteMember = async (
     });
 
     // Generate the invite URL
-    const inviteUrl = `${process.env.BASE_URL}/invite?teamId=${teamId}&userId=${user.id}`;
+    const inviteUrl = `${process.env.BASE_URL}/invites/accept/${teamId}/${user.id}`;
 
     await resend.emails.send({
       from: `Ekrema < ${process.env.EMAIL_FROM}>`,
-      to: email,
+      /* to: email, */
+      to: "ekremamass@gmail.com",
       subject: "Taskey Team Invitation",
       react: InviteUserEmail({
         username: user.name ?? "User",
