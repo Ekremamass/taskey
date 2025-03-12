@@ -18,7 +18,7 @@ export default async function TaskCreatePage({
   if (!teamId) {
     return <div>Invalid Team Id</div>;
   }
-  const team = prisma.team.findUnique({
+  const team = await prisma.team.findUnique({
     where: {
       id: teamId,
     },
@@ -29,5 +29,7 @@ export default async function TaskCreatePage({
   }
   const projects = (await getTeamProjects(teamId)) || null;
 
-  return <TaskCreateForm projects={projects} teams={[]} />;
+  console.log("Projects:", projects);
+
+  return <TaskCreateForm projects={projects}  />;
 }

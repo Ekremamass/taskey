@@ -35,11 +35,10 @@ export async function createTask(formData: FormData) {
   const validatedFields = TaskSchema.safeParse({
     title: formData.get("title"),
     description: formData.get("description"),
-    assignedToId: formData.get("assignedToId"),
     projectId: formData.get("projectId"),
     teamId: formData.get("teamId"),
-    calendarId: formData.get("calendarId"),
-    published: formData.get("published"),
+/*     calendarId: formData.get("calendarId"),
+ */   
   });
 
   if (!validatedFields.success) {
