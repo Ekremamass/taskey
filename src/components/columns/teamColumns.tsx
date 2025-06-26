@@ -12,7 +12,7 @@ import {
 import { FaUsers, FaInfoCircle } from "react-icons/fa";
 import Link from "next/link";
 import { getUserNameById } from "@/actions/user";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { useSession } from "next-auth/react";
 
@@ -62,7 +62,7 @@ export const columns: ColumnDef<Team>[] = [
             {row.original.ownerId === user?.id && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link href={`/tasks/delete/${row.original.id}`}>
+                  <Link href={`/teams/delete/${row.original.id}`}>
                     <Button variant="destructive" size="icon">
                       <MdDelete />
                     </Button>

@@ -374,6 +374,16 @@ export async function deleteTeam(teamId: number) {
   }
 
   try {
+    // Delete related records in TeamsOnUsers
+    await prisma.teamsOnUsers.deleteMany({
+      where: { teamId: teamId },
+    });
+
+    // Delete related tasks
+    await prisma.task.deleteMany({
+      where: { teamId: teamId },
+    });
+
     // Delete the team
     await prisma.team.delete({
       where: { id: teamId },

@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 const AcceptInvitePage = () => {
   const router = useRouter();

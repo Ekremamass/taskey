@@ -7,7 +7,6 @@ import {
   CreditCard,
   LogOut,
   Sparkles,
-  LogIn,
   UserPlus,
 } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
